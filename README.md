@@ -1,24 +1,31 @@
 # Email Signature Generator
 
-A single-file, no-build web page that makes an email signature styled like a terminal "fetch" tool (think `neofetch`): ASCII logo on the left, `Label: value` rows on the right, and a color ramp along the bottom.
+**[▶ Open the generator](https://kevinsays.github.io/EmailSignatureGenerator/)**. It runs in your browser, with no sign-up and nothing to install.
 
-You edit a `signature.conf`-style form and the preview updates as you type. When you're done, you export it.
+Make an email signature that looks like a terminal "fetch" readout (think `neofetch`): ASCII logo on the left, `Label: value` rows on the right, and a color strip along the bottom. Choose a dark terminal look or a quieter light version for work email.
 
-## Usage
+| Dark terminal | Light paper |
+|---|---|
+| ![Dark signature preview](docs/preview-dark.png) | ![Light signature preview](docs/preview-light.png) |
 
-1. Open `signature-generator.html` in any modern browser (double-click it, or host it on GitHub Pages).
-2. Fill in your name, title, org and email. Use the checkboxes to turn optional rows (phone, website, location, certs, os, shell) on or off.
-3. Pick an accent color and an ASCII logo.
-4. Export:
-   - **Copy signature HTML**: an inline-styled table you can paste into the Gmail or Outlook (web) signature editor.
-   - **Copy plain text**: for plain-text clients.
-   - **Download PNG**: a 2× image. Use this when your client strips fonts and colors (Outlook desktop is the usual culprit).
+![The full generator: settings on the left, live preview on the right](docs/screenshot.png)
 
-Nothing leaves your browser. There's no server, tracking or storage.
+## How to use it
+
+1. **[Open the generator](https://kevinsays.github.io/EmailSignatureGenerator/)**. You can also download `index.html` and double-click it, since it works offline.
+2. Fill in your name, title, organization and email. Tick the boxes to add optional rows like phone, website or location.
+3. Pick a color, an ASCII logo and a background (**Dark terminal** or **Light paper**).
+4. Export it:
+   - **Copy signature HTML**: paste into Gmail, Outlook or Apple Mail. Email, phone and website are clickable links.
+   - **Copy plain text**: for plain-text emails and mobile apps.
+   - **Download PNG**: a sharp image. Use this when your email app strips colors and fonts (classic Outlook desktop is the usual culprit).
+5. Open **How to add this to your email** on the page for step-by-step instructions for Gmail, Outlook (web/new), classic Outlook and Apple Mail.
+
+**Privacy:** everything happens in your browser. Nothing you type is sent anywhere, and there's no tracking.
 
 ## Adapting it
 
-Everything you'd want to change is near the top of the `<script>` block in `signature-generator.html`.
+Everything you'd want to change is near the top of the `<script>` block in `index.html`.
 
 ### Use your organization's brand colors
 Edit the `brand` entries in `ACCENTS`:
@@ -47,6 +54,7 @@ Optional fields show up in the preview automatically. Required (non-optional) ro
 Add an array of strings to `LOGOS` and a matching label to `LOGO_LABELS`. Escape backslashes (`\\`). Keep it under ~10 lines so the signature stays compact.
 
 ### Change the look
+- Signature backgrounds are defined in `STYLES` (`dark` and `light`). Add your own, for example a navy "brand" background. In light mode the accent uses `ramp[2]`, a darker shade, so it stays readable on white.
 - Window chrome text (`zsh — ~/dotfiles/signature.conf`) appears in the HTML (`.tpath`) and in `downloadPng()`.
 - Page colors are CSS variables in `:root`.
 - Fonts: JetBrains Mono for the preview and PNG. The email HTML falls back to `Consolas, Monaco, 'Courier New'` because most clients won't load web fonts.
@@ -54,12 +62,12 @@ Add an array of strings to `LOGOS` and a matching label to `LOGO_LABELS`. Escape
 ### Other ideas
 - Drop the terminal theme: rewrite `generateEmailHtml()` for a conventional layout and keep the editor/export plumbing.
 - Add an `<img>` logo cell (hosted URL) in place of ASCII art for a more corporate signature.
-- Make it a team tool: publish via GitHub Pages and add a URL-parameter prefill (`?org=...&website=...`).
+- Make it a team tool: fork it, set your org's defaults, enable GitHub Pages on your fork, and share the link.
 
 ## Email client notes
 - **Gmail / Outlook web**: paste the HTML copy straight into the signature settings.
 - **Outlook desktop / Apple Mail**: results vary. The PNG is the reliable fallback. Link it to your website if you want it clickable.
-- Dark backgrounds can look heavy in light-mode inboxes. Test by sending yourself an email.
+- The dark style can look heavy in light-mode inboxes. Switch to **Light paper** if that bothers you, and test by sending yourself an email.
 
 ## License
 MIT. Use it, fork it, rebrand it.

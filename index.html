@@ -101,7 +101,9 @@
   /* ---- terminal preview ---- */
   .preview-col{ position:sticky; top:20px; }
   .term-wrap{
-    background:var(--term-bg); border-radius:10px; overflow:hidden;
+    --sig-bg:#0b0d12; --sig-chrome:#171a21; --sig-border:#20232b;
+    --sig-text:#c9cdd6; --sig-dim:#4b515e; --sig-path:#7d8494; --sig-accent:var(--accent);
+    background:var(--sig-bg); border-radius:10px; overflow:hidden;
     box-shadow:0 24px 48px rgba(0,0,0,.4), 0 0 0 1px var(--panel-border);
     position:relative;
   }
@@ -110,25 +112,28 @@
     background:repeating-linear-gradient(to bottom, rgba(255,255,255,.012) 0px, rgba(255,255,255,.012) 1px, transparent 1px, transparent 3px);
     mix-blend-mode:overlay;
   }
+  .term-wrap.light{ box-shadow:0 24px 48px rgba(0,0,0,.4), 0 0 0 1px var(--sig-border); }
+  .term-wrap.light::after{ display:none; }
   .titlebar{
-    background:var(--term-chrome); padding:10px 14px; display:flex; align-items:center; gap:8px;
-    border-bottom:1px solid #20232b;
+    background:var(--sig-chrome); padding:10px 14px; display:flex; align-items:center; gap:8px;
+    border-bottom:1px solid var(--sig-border);
   }
   .tdot{ width:11px; height:11px; border-radius:50%; }
   .tdot.r{ background:#e5675f; } .tdot.y{ background:#e6b350; } .tdot.g{ background:#59c26b; }
-  .tpath{ margin-left:8px; color:var(--text-dim); font-family:var(--mono); font-size:12px; }
+  .tpath{ margin-left:8px; color:var(--sig-path); font-family:var(--mono); font-size:12px; }
   .term-body{ display:flex; gap:26px; padding:26px; flex-wrap:wrap; }
   .logo-art{
     white-space:pre; font-family:var(--mono); font-size:12px; line-height:1.35;
-    color:var(--accent); margin:0; flex-shrink:0;
+    color:var(--sig-accent); margin:0; flex-shrink:0;
   }
   .info{ font-family:var(--mono); font-size:13px; line-height:1.85; min-width:200px; }
-  .info .header-line{ color:var(--accent); font-weight:700; font-size:14px; }
-  .info .sep-line{ color:var(--text-dim); }
-  .info .row .label{ display:inline-block; min-width:70px; color:var(--accent); font-weight:600; }
-  .info .row .value{ color:#c9cdd6; }
+  .info .header-line{ color:var(--sig-accent); font-weight:700; font-size:14px; }
+  .info .sep-line{ color:var(--sig-dim); }
+  .info .row .label{ display:inline-block; min-width:70px; color:var(--sig-accent); font-weight:600; }
+  .info .row .value{ color:var(--sig-text); }
+  .info .row a.value{ text-decoration:none; border-bottom:1px dotted var(--sig-dim); }
   .cursor{
-    display:inline-block; width:7px; height:14px; background:var(--accent);
+    display:inline-block; width:7px; height:14px; background:var(--sig-accent);
     margin-left:2px; vertical-align:-2px; animation:blink 1.1s steps(1) infinite;
   }
   @media (prefers-reduced-motion: reduce){ .cursor{ animation:none; } }
@@ -148,6 +153,39 @@
   .toast.show{ opacity:1; }
   .hint{ font-size:12px; color:var(--text-muted); margin-top:12px; line-height:1.6; max-width:560px; }
   .hint b{ color:var(--text-primary); }
+
+  /* ---- install guide ---- */
+  .guide{
+    margin-top:18px; background:var(--panel-bg); border:1px solid var(--panel-border);
+    border-radius:10px; padding:0; font-size:13px; line-height:1.6;
+  }
+  .guide summary{
+    cursor:pointer; padding:14px 18px; font-weight:600; list-style:none;
+    display:flex; align-items:center; gap:8px;
+  }
+  .guide summary::-webkit-details-marker{ display:none; }
+  .guide summary::before{ content:'▸'; color:var(--accent); font-family:var(--mono); transition:transform .15s; }
+  .guide[open] summary::before{ transform:rotate(90deg); }
+  .guide-body{ padding:0 18px 18px; }
+  .tabs{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+  .tab{
+    padding:6px 12px; border-radius:6px; border:1px solid var(--panel-border);
+    background:#14161b; color:var(--text-muted); font-family:var(--mono); font-size:12px; cursor:pointer;
+  }
+  .tab[aria-selected="true"]{ border-color:var(--accent); color:var(--text-primary); }
+  .tab:focus-visible, .swatch-btn:focus-visible, .logo-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .panel ol{ margin:0 0 10px; padding-left:20px; color:var(--text-primary); }
+  .panel li{ margin-bottom:4px; }
+  .panel .note{ color:var(--text-muted); font-size:12px; margin:0; }
+  .panel kbd{
+    font-family:var(--mono); font-size:11.5px; background:#14161b; border:1px solid var(--panel-border);
+    border-radius:4px; padding:1px 5px; color:#ffb37a;
+  }
+  .guide .tip{
+    margin:12px 0 0; padding:10px 12px; border-left:3px solid var(--accent);
+    background:#14161b; border-radius:0 6px 6px 0; color:var(--text-muted); font-size:12px;
+  }
+  .guide .tip b{ color:var(--text-primary); }
 </style>
 </head>
 <body>
@@ -166,11 +204,13 @@
         <div class="swatches" id="swatches"></div>
         <div class="theme-label"># theme — logo</div>
         <div class="logo-choices" id="logoChoices"></div>
+        <div class="theme-label" style="margin-top:14px"># theme — background</div>
+        <div class="logo-choices" id="styleChoices"></div>
       </div>
     </div>
 
     <div class="preview-col">
-      <div class="term-wrap">
+      <div class="term-wrap" id="termWrap">
         <div class="titlebar">
           <div class="tdot r"></div><div class="tdot y"></div><div class="tdot g"></div>
           <div class="tpath">zsh — ~/dotfiles/signature.conf</div>
@@ -189,9 +229,69 @@
         <span class="toast" id="toast"></span>
       </div>
       <p class="hint">
-        <b>Copy signature HTML</b> copies the rendered block — paste it straight into Gmail's or Outlook's signature editor.
-        <b>Download PNG</b> is the safest bet if your client (Outlook desktop especially) strips fonts and colors — embed the image instead.
+        <b>Copy signature HTML</b> copies the rendered block, with clickable email, phone and website links. Paste it into your email's signature settings (steps below).
+        <b>Download PNG</b> is the safest bet if your client (Outlook desktop especially) strips fonts and colors. Embed the image instead.
+        Prefer something quieter for work email? Switch <b>background</b> to light.
       </p>
+
+      <details class="guide" id="guide">
+        <summary>How to add this to your email</summary>
+        <div class="guide-body">
+          <div class="tabs" role="tablist" id="guideTabs">
+            <button class="tab" role="tab" aria-selected="true" data-panel="p-gmail">Gmail</button>
+            <button class="tab" role="tab" aria-selected="false" data-panel="p-owa">Outlook (web / new)</button>
+            <button class="tab" role="tab" aria-selected="false" data-panel="p-outlook">Outlook (classic desktop)</button>
+            <button class="tab" role="tab" aria-selected="false" data-panel="p-apple">Apple Mail</button>
+          </div>
+
+          <div class="panel" role="tabpanel" id="p-gmail">
+            <ol>
+              <li>Click <b>Copy signature HTML</b> above.</li>
+              <li>In Gmail, click the gear icon, then <kbd>See all settings</kbd>.</li>
+              <li>On the <kbd>General</kbd> tab, scroll to <kbd>Signature</kbd> and click <kbd>Create new</kbd>. Give it a name.</li>
+              <li>Click into the signature box and paste (<kbd>Ctrl</kbd>+<kbd>V</kbd> / <kbd>⌘</kbd>+<kbd>V</kbd>).</li>
+              <li>Under <kbd>Signature defaults</kbd>, pick it for new emails and replies.</li>
+              <li>Scroll to the bottom and click <kbd>Save Changes</kbd>.</li>
+            </ol>
+            <p class="note">Gmail's mobile apps use a separate plain-text signature. Use <b>Copy plain text</b> for those.</p>
+          </div>
+
+          <div class="panel" role="tabpanel" id="p-owa" hidden>
+            <ol>
+              <li>Click <b>Copy signature HTML</b> above.</li>
+              <li>In Outlook on the web (or the new Outlook app), click the gear icon, then <kbd>Account</kbd> → <kbd>Signatures</kbd>.</li>
+              <li>Click <kbd>+ New signature</kbd> and give it a name.</li>
+              <li>Paste into the editor.</li>
+              <li>Choose it as the default for new messages and replies, then click <kbd>Save</kbd>.</li>
+            </ol>
+            <p class="note">If the dark background disappears after pasting, switch to the light background, or use the PNG instead.</p>
+          </div>
+
+          <div class="panel" role="tabpanel" id="p-outlook" hidden>
+            <ol>
+              <li>Click <b>Download PNG</b> above. Classic Outlook often strips pasted colors and fonts, so the image is the reliable choice.</li>
+              <li>In Outlook, go to <kbd>File</kbd> → <kbd>Options</kbd> → <kbd>Mail</kbd> → <kbd>Signatures…</kbd></li>
+              <li>Click <kbd>New</kbd> and name it.</li>
+              <li>In the editor, click the picture icon and insert the PNG. Optionally, select it and click the link icon to point it at your website.</li>
+              <li>Set it as the default for new messages and replies, then click <kbd>OK</kbd>.</li>
+            </ol>
+            <p class="note">You can try pasting the HTML copy first. If it looks right, keep it, since text stays selectable and links stay clickable.</p>
+          </div>
+
+          <div class="panel" role="tabpanel" id="p-apple" hidden>
+            <ol>
+              <li>Click <b>Copy signature HTML</b> (or <b>Download PNG</b>) above.</li>
+              <li>In Mail, open <kbd>Mail</kbd> → <kbd>Settings</kbd> → <kbd>Signatures</kbd>.</li>
+              <li>Select your account and click <kbd>+</kbd>.</li>
+              <li>Uncheck <kbd>Always match my default message font</kbd>.</li>
+              <li>Paste the HTML into the right-hand box, or drag the PNG in.</li>
+            </ol>
+            <p class="note">Mail saves as you go. Choose the signature for each account from the dropdown under the list.</p>
+          </div>
+
+          <p class="tip"><b>Always test it:</b> send an email to yourself (ideally to a different provider too) and check it in both light and dark mode before you rely on it.</p>
+        </div>
+      </details>
     </div>
   </div>
 </div>
@@ -220,6 +320,13 @@
     amber: { name:'P3 · Amber',   hex:'#FFB000', group:'phosphor', ramp:['#4d3200','#805300','#b37400','#e69500','#ffb000','#ffd166'] },
     cyan:  { name:'5153 · Cyan',  hex:'#5CD6D6', group:'phosphor', ramp:['#0f3d3d','#1f6b6b','#2f9999','#47c2c2','#5cd6d6','#a8ecec'] },
     white: { name:'VT220 · White',hex:'#E8E8E8', group:'phosphor', ramp:['#3a3a3a','#5c5c5c','#7d7d7d','#a0a0a0','#c4c4c4','#e8e8e8'] },
+  };
+
+  // Signature background styles. In light mode the accent uses a darker shade
+  // from the ramp (index 2) so it stays readable on white.
+  const STYLES = {
+    dark:  { label:'Dark terminal', bg:'#0b0d12', chrome:'#171a21', border:'#20232b', text:'#c9cdd6', dim:'#4b515e', path:'#7d8494', accent: a => a.hex },
+    light: { label:'Light paper',   bg:'#ffffff', chrome:'#eef0f3', border:'#dde1e7', text:'#2a2f3a', dim:'#a3a9b4', path:'#6b7280', accent: a => a.ramp[2] },
   };
 
   const LOGOS = {
@@ -282,7 +389,7 @@
     none: []
   };
 
-  const state = { values:{}, show:{}, accent:'green', logo:'mountain' };
+  const state = { values:{}, show:{}, accent:'green', logo:'mountain', style:'dark' };
   FIELD_DEFS.forEach(f=>{
     state.values[f.key] = f.default;
     state.show[f.key] = f.optional ? !!f.defaultShow : true;
@@ -354,7 +461,8 @@
       swatchesEl.appendChild(g);
       lastAccentGroup = a.group;
     }
-    const btn = document.createElement('div');
+    const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'swatch-btn' + (state.accent===key ? ' active' : '');
     btn.id = 'accent-' + key;
     btn.innerHTML = '<span class="dot" style="background:'+a.hex+'"></span>' + a.name;
@@ -370,7 +478,8 @@
   const logoChoicesEl = $('logoChoices');
   const LOGO_LABELS = { mountain:'Mountain', shield:'Shield', server:'Server', chip:'Chip', padlock:'Padlock', cursor:'Cursor', none:'None' };
   Object.keys(LOGO_LABELS).forEach(key=>{
-    const btn = document.createElement('div');
+    const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'logo-btn' + (state.logo===key ? ' active' : '');
     btn.id = 'logo-' + key;
     btn.textContent = LOGO_LABELS[key];
@@ -382,30 +491,79 @@
     logoChoicesEl.appendChild(btn);
   });
 
+  // ---------- background style choices ----------
+  const styleChoicesEl = $('styleChoices');
+  Object.keys(STYLES).forEach(key=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'logo-btn' + (state.style===key ? ' active' : '');
+    btn.id = 'style-' + key;
+    btn.textContent = STYLES[key].label;
+    btn.addEventListener('click', ()=>{
+      state.style = key;
+      Object.keys(STYLES).forEach(k=> $('style-'+k).classList.toggle('active', k===key));
+      renderAll();
+    });
+    styleChoicesEl.appendChild(btn);
+  });
+
+  // ---------- install guide tabs ----------
+  const tabs = Array.from(document.querySelectorAll('#guideTabs .tab'));
+  tabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      tabs.forEach(t=>{
+        const on = t===tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        $(t.dataset.panel).hidden = !on;
+      });
+    });
+  });
+
+  // ---------- links ----------
+  // Returns an href for fields that should be clickable, or null.
+  function hrefFor(key, value){
+    const v = (value||'').trim();
+    if(!v) return null;
+    if(key==='email' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'mailto:' + v;
+    if(key==='phone'){
+      const digits = v.replace(/[^\d+]/g,'');
+      return digits.replace(/\D/g,'').length >= 7 ? 'tel:' + digits : null;
+    }
+    if(key==='website' && /^[^\s]+\.[^\s]+$/.test(v)) return /^https?:\/\//i.test(v) ? v : 'https://' + v;
+    return null;
+  }
+
   // ---------- model ----------
   function buildModel(){
     const name = slugFallback(state.values.name, 'Your Name');
     const header = name;
     const sepLen = Math.max(header.length, 10);
     const rows = [
-      { label:'Title', value: slugFallback(state.values.title, '') },
-      { label:'Org',   value: slugFallback(state.values.org, '') },
-      { label:'Email', value: slugFallback(state.values.email, '') },
+      { key:'title', label:'Title', value: slugFallback(state.values.title, '') },
+      { key:'org',   label:'Org',   value: slugFallback(state.values.org, '') },
+      { key:'email', label:'Email', value: slugFallback(state.values.email, '') },
     ];
     FIELD_DEFS.filter(f=>f.optional).forEach(f=>{
       if(state.show[f.key]){
-        rows.push({ label: f.key.charAt(0).toUpperCase()+f.key.slice(1), value: state.values[f.key] || '' });
+        rows.push({ key: f.key, label: f.key.charAt(0).toUpperCase()+f.key.slice(1), value: state.values[f.key] || '' });
       }
     });
+    rows.forEach(r=>{ r.href = hrefFor(r.key, r.value); });
     const accent = ACCENTS[state.accent];
+    const theme = STYLES[state.style];
     const logoLines = LOGOS[state.logo];
-    return { header, separator:'-'.repeat(sepLen), rows, accent, logoLines };
+    return { header, separator:'-'.repeat(sepLen), rows, accent, theme, ink: theme.accent(accent), logoLines };
   }
 
   // ---------- render preview ----------
   function renderAll(){
     const m = buildModel();
     document.documentElement.style.setProperty('--accent', m.accent.hex);
+    const tw = $('termWrap');
+    tw.classList.toggle('light', state.style==='light');
+    [['--sig-bg','bg'],['--sig-chrome','chrome'],['--sig-border','border'],['--sig-text','text'],['--sig-dim','dim'],['--sig-path','path']]
+      .forEach(([v,k])=> tw.style.setProperty(v, m.theme[k]));
+    tw.style.setProperty('--sig-accent', m.ink);
 
     $('logoArt').textContent = m.logoLines.join('\n');
 
@@ -413,7 +571,10 @@
     let html = '<div class="header-line">'+escapeHtml(m.header)+'</div>';
     html += '<div class="sep-line">'+escapeHtml(m.separator)+'</div>';
     m.rows.forEach(r=>{
-      html += '<div class="row"><span class="label">'+escapeHtml(r.label)+':</span><span class="value">'+escapeHtml(r.value)+'</span></div>';
+      const val = r.href
+        ? '<a class="value" href="'+escapeHtml(r.href)+'" target="_blank" rel="noopener">'+escapeHtml(r.value)+'</a>'
+        : '<span class="value">'+escapeHtml(r.value)+'</span>';
+      html += '<div class="row"><span class="label">'+escapeHtml(r.label)+':</span>'+val+'</div>';
     });
     html += '<span class="cursor"></span>';
     infoEl.innerHTML = html;
@@ -433,20 +594,23 @@
     const logoHtml = m.logoLines.map(l => escapeHtml(l).replace(/ /g,'&nbsp;')).join('<br>');
     let rowsHtml = '';
     m.rows.forEach(r=>{
-      rowsHtml += '<span style="color:'+m.accent.hex+';font-weight:bold;">'+escapeHtml(r.label)+':&nbsp;</span>'
-                + '<span style="color:#c9cdd6;">'+escapeHtml(r.value).replace(/ /g,'&nbsp;')+'</span><br>';
+      const text = escapeHtml(r.value).replace(/ /g,'&nbsp;');
+      const val = r.href
+        ? '<a href="'+escapeHtml(r.href)+'" style="color:'+m.theme.text+';text-decoration:none;">'+text+'</a>'
+        : '<span style="color:'+m.theme.text+';">'+text+'</span>';
+      rowsHtml += '<span style="color:'+m.ink+';font-weight:bold;">'+escapeHtml(r.label)+':&nbsp;</span>' + val + '<br>';
     });
     const logoCell = m.logoLines.length
-      ? '<td style="vertical-align:top;padding-right:20px;font-size:12px;line-height:1.35;color:'+m.accent.hex+';font-family:'+fontStack+';">'+logoHtml+'</td>'
+      ? '<td style="vertical-align:top;padding-right:20px;font-size:12px;line-height:1.35;color:'+m.ink+';font-family:'+fontStack+';">'+logoHtml+'</td>'
       : '';
     return ''
-      + '<table cellpadding="0" cellspacing="0" border="0" style="background-color:#0b0d12;border-radius:8px;">'
+      + '<table cellpadding="0" cellspacing="0" border="0" style="background-color:'+m.theme.bg+';border:1px solid '+m.theme.border+';border-radius:8px;">'
       +   '<tr><td style="padding:22px;">'
       +     '<table cellpadding="0" cellspacing="0" border="0"><tr>'
       +       logoCell
       +       '<td style="vertical-align:top;font-size:13px;line-height:1.9;font-family:'+fontStack+';">'
-      +         '<span style="color:'+m.accent.hex+';font-weight:bold;font-size:14px;">'+escapeHtml(m.header)+'</span><br>'
-      +         '<span style="color:#4b515e;">'+escapeHtml(m.separator)+'</span><br>'
+      +         '<span style="color:'+m.ink+';font-weight:bold;font-size:14px;">'+escapeHtml(m.header)+'</span><br>'
+      +         '<span style="color:'+m.theme.dim+';">'+escapeHtml(m.separator)+'</span><br>'
       +         rowsHtml
       +       '</td>'
       +     '</tr></table>'
@@ -500,7 +664,8 @@
   $('copyEmailBtn').addEventListener('click', async ()=>{
     const m = buildModel();
     const ok = await copyRichHtml(generateEmailHtml(m));
-    showToast(ok ? 'Copied — paste into your signature editor' : 'Copy failed — try selecting manually');
+    showToast(ok ? 'Copied. Now paste it into your email settings (steps below)' : 'Copy failed. Try the PNG instead');
+    if(ok) $('guide').open = true;
   });
 
   $('copyTextBtn').addEventListener('click', async ()=>{
@@ -569,11 +734,13 @@
     roundedRectPath(ctx,0,0,totalW,totalH,12);
     ctx.clip();
 
-    ctx.fillStyle = '#0b0d12';
+    ctx.fillStyle = m.theme.bg;
     ctx.fillRect(0,0,totalW,totalH);
 
-    ctx.fillStyle = '#171a21';
+    ctx.fillStyle = m.theme.chrome;
     ctx.fillRect(0,0,totalW,titlebarH);
+    ctx.fillStyle = m.theme.border;
+    ctx.fillRect(0,titlebarH-1,totalW,1);
     const dotY = titlebarH/2, dotR = 5.5;
     ['#e5675f','#e6b350','#59c26b'].forEach((c,i)=>{
       ctx.beginPath();
@@ -581,7 +748,7 @@
       ctx.fillStyle = c;
       ctx.fill();
     });
-    ctx.fillStyle = '#7d8494';
+    ctx.fillStyle = m.theme.path;
     ctx.font = font12;
     ctx.textBaseline = 'middle';
     ctx.fillText('zsh — ~/dotfiles/signature.conf', 78, dotY+1);
@@ -589,7 +756,7 @@
     let x = pad;
     const contentTop = titlebarH + pad;
     if(m.logoLines.length){
-      ctx.fillStyle = m.accent.hex;
+      ctx.fillStyle = m.ink;
       ctx.font = font12;
       ctx.textBaseline = 'top';
       m.logoLines.forEach((line,i)=>{
@@ -600,22 +767,22 @@
 
     let y = contentTop;
     ctx.font = font14b;
-    ctx.fillStyle = m.accent.hex;
+    ctx.fillStyle = m.ink;
     ctx.textBaseline = 'top';
     ctx.fillText(m.header, x, y);
     y += lineH;
 
     ctx.font = font13;
-    ctx.fillStyle = '#4b515e';
+    ctx.fillStyle = m.theme.dim;
     ctx.fillText(m.separator, x, y);
     y += lineH;
 
     m.rows.forEach(r=>{
       ctx.font = "bold 13px 'JetBrains Mono', Consolas, Menlo, monospace";
-      ctx.fillStyle = m.accent.hex;
+      ctx.fillStyle = m.ink;
       ctx.fillText(r.label + ':', x, y);
       ctx.font = font13;
-      ctx.fillStyle = '#c9cdd6';
+      ctx.fillStyle = m.theme.text;
       ctx.fillText(r.value, x + labelColWidth, y);
       y += lineH;
     });
@@ -630,6 +797,12 @@
     });
 
     ctx.restore();
+    if(state.style==='light'){
+      ctx.strokeStyle = m.theme.border;
+      ctx.lineWidth = 1;
+      roundedRectPath(ctx,.5,.5,totalW-1,totalH-1,12);
+      ctx.stroke();
+    }
 
     const url = canvas.toDataURL('image/png');
     const a = document.createElement('a');
